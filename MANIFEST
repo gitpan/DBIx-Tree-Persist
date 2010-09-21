@@ -1,0 +1,19 @@
+Build.PL
+Changelog.ini
+CHANGES
+data/two.txt
+lib/DBIx/Tree/Persist.pm
+lib/DBIx/Tree/Persist/.htdbix.tree.persist.conf
+lib/DBIx/Tree/Persist/Config.pm
+lib/DBIx/Tree/Persist/Create.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+scripts/create.tables.pl
+scripts/drop.tables.pl
+scripts/populate.tables.pl
+scripts/report.tables.pl
+scripts/test.sh
+scripts/tree.pl
+t/pod.t
+t/test.t
