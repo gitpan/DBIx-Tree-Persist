@@ -2,22 +2,60 @@ package DBIx::Tree::Persist;
 
 use common::sense;
 
+use Data::Dumper::Concise; # For Dumper().
+
 use DBI;
 
 use DBIx::Tree::Persist::Config;
 
 use Hash::FieldHash ':all';
 
-fieldhash my %copy_name   => 'copy_name';
-fieldhash my %dbh         => 'dbh';
-fieldhash my %starting_id => 'starting_id';
-fieldhash my %table_name  => 'table_name';
-fieldhash my %verbose     => 'verbose';
+fieldhash my %copy_name       => 'copy_name';
+fieldhash my %data_structure  => 'data_structure';
+fieldhash my %dbh             => 'dbh';
+fieldhash my %starting_id     => 'starting_id';
+fieldhash my %table_name      => 'table_name';
+fieldhash my %verbose         => 'verbose';
 
 use Tree;
 use Tree::Persist;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
+
+# -----------------------------------------------
+
+sub build_structure
+{
+	my($self, @node) = @_;
+	my($item_data)   = [];
+
+	my(@children);
+
+	for my $node (@node)
+	{
+		@children = $node -> children;
+
+		if ($#children >= 0)
+		{
+			push @$item_data,
+			{
+				text    => $node -> value,
+				submenu =>
+				{
+					id       => 'id_' . $self -> get_id_of_node($node),
+					itemdata => $self -> build_structure(@children),
+				},
+			};
+		}
+		else
+		{
+			push @$item_data, {text => $node -> value};
+		}
+	}
+
+	return $item_data;
+
+} # End of build_structure.
 
 # -----------------------------------------------
 # Note: We use 0, not null, as the parent of the root.
@@ -67,6 +105,19 @@ sub copy_table
 
 } # End of copy_table.
 
+# --------------------------------------------------
+
+sub get_id_of_node
+{
+	my($self, $node) = @_;
+	my($meta) = $node -> meta;
+	my(@key)  = grep{length} keys %$meta;
+	my($id)   = $$meta{$key[0]}{id};
+
+	return $id;
+
+} # End of get_id_of_node;
+
 # -----------------------------------------------
 
 sub log
@@ -85,21 +136,48 @@ sub log
 
 sub new
 {
-	my($class, %arg)   = @_;
-	$arg{copy_name}    ||= '';
-	$arg{starting_id}  ||= 1;
-	$arg{table_name}   ||= '';
-	$arg{verbose}      ||= 0;
-	my($self)          = from_hash(bless({}, $class), \%arg);
-	my($config)        = DBIx::Tree::Persist::Config -> new -> config;
-	my(@dsn)           = ($$config{dsn}, $$config{username}, $$config{password});
-	my($attr)          = {};
+	my($class, %arg)     = @_;
+	$arg{copy_name}      ||= '';
+	$arg{dbh}            ||= '';
+	$arg{data_structure} ||= 0;
+	$arg{starting_id}    ||= 1;
+	$arg{table_name}     ||= '';
+	$arg{verbose}        ||= 0;
+	my($self)            = from_hash(bless({}, $class), \%arg);
+ 
+	if (! $self -> dbh)
+	{
+		my($config) = DBIx::Tree::Persist::Config -> new -> config;
+		my(@dsn)    = ($$config{dsn}, $$config{username}, $$config{password});
+		my($attr)   = {};
 
-	$self -> dbh(DBI -> connect(@dsn, $attr) );
+		$self -> dbh(DBI -> connect(@dsn, $attr) );
+	}
 
 	return $self;
 
 }	# End of new.
+
+# -----------------------------------------------
+
+sub pretty_print
+{
+	my($self, $tree) = @_;
+
+	my($depth);
+	my($id);
+	my($value);
+
+	for my $node ($tree -> traverse($tree -> PRE_ORDER) )
+	{
+		$depth = $node -> depth;
+		$id    = $self -> get_id_of_node($node);
+		$value = $node -> value;
+
+		$self -> log(' ' x $depth . "$value ($id)");
+	}
+
+} # End of pretty_print.
 
 # -----------------------------------------------
 
@@ -135,26 +213,19 @@ sub traverse
 
 	# Traverse tree.
 
-	my($depth);
-	my($id);
-	my(@key);
-	my($meta);
-	my($value);
-
-	for my $node ($tree -> traverse($tree -> PRE_ORDER) )
-	{
-		$depth = $node -> depth;
-		$meta  = $node -> meta;
-		@key   = keys %$meta;
-		$id    = $$meta{$key[0]}{id};
-		$value = $node -> value;
-
-		print ' ' x $depth, "$value ($id)\n";
-	}
-
-	$self -> log;
+	$self -> data_structure ? $self -> ugly_print($tree) : $self -> pretty_print($tree);
 
 } # End of traverse.
+
+# -----------------------------------------------
+
+sub ugly_print
+{
+	my($self, $tree) = @_;
+
+	$self -> log(Dumper($self -> build_structure($tree) ) );
+
+} # End of ugly_print.
 
 # -----------------------------------------------
 
@@ -255,6 +326,11 @@ The tree structures for the 2 trees printed by the last 2 commands will be the s
 However, since the trees are stored at different offsets within table one, the ids
 associated with each corresponding node will be different.
 
+=item scripts/tree.pl -t one -d -s 1 -v
+
+Use the -data_structure option to call the C<build_structure()> method, and to output
+that structure instead of pretty-printing the tree.
+
 =back
 
 =head1 Description
@@ -267,6 +343,12 @@ This module is available as a Unix-style distro (*.tgz).
 
 See L<http://savage.net.au/Perl-modules/html/installing-a-module.html> for
 help on unpacking and installing distros.
+
+=head1 Method: build_structure($root)
+
+Returns a Perl data structure which can be turned into JSON.
+
+The -data_structure option to scripts/tree.pl gives you access to this feature.
 
 =head1 Method: copy_table()
 
@@ -290,6 +372,17 @@ copy_name is optional.
 
 If specified, the code copies the data from the table named with the -t option
 to the table named with the -c option.
+
+=item dbh => $dbh
+
+dbh is optional.
+
+If specified, the code uses the $dbh provided.
+
+If not specified, the code reads the config file lib/DBIx/Tree/Persist/.htdbix.tree.persist.conf
+to get parameters and calls DBI -> connect() to generate a dbh.
+
+This is mainly used for testing. See t/test.t.
 
 =item starting_id => N
 
@@ -318,6 +411,11 @@ If not specified, it defaults to 0, which minimizes output.
 
 =back
 
+=head1 Method: pretty_print($root)
+
+Print the tree nicely. This method is called from C<traverse()> if the -data_structure option
+is not used.
+
 =head1 Method: run()
 
 After calling new(...), you have to call run(). See scripts/tree.pl for sample code.
@@ -329,6 +427,11 @@ If copy_name is used to pass a table name to new(), sub run() calls sub copy_tab
 If copy_name is not used, sub run() calls sub traverse().
 
 sub traverse() shows how to build a tree from a disk file, and to then process that tree.
+
+if the -data_structure option (to scripts/tree.pl) is used, the tree is converted to a data structure,
+which is then printed using the C<Dumper()> method of L<Data::Dumper::Concise>.
+
+If the -data_structure option is not used, the tree is pretty-printed by calling the method C<pretty_print()>.
 
 =head1 Support
 
@@ -347,6 +450,10 @@ L<DBIx::Tree>.
 L<Tree>.
 
 L<Tree::Persist>.
+
+L<Tree::DAG_Node>.
+
+L<Tree::DAG_Node::Persist>.
 
 =head1 Author
 

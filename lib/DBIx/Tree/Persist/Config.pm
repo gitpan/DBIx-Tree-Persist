@@ -11,7 +11,7 @@ fieldhash my %config_file_path => 'config_file_path';
 fieldhash my %section          => 'section';
 fieldhash my %verbose          => 'verbose';
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 # -----------------------------------------------
 

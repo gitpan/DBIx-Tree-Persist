@@ -1,37 +1,20 @@
+#!/usr/bin/perl
+
 use common::sense;
 
-use Test::More tests => 8;
+use Test::More tests => 10;
 
 use DBI;
 
+use DBIx::Admin::CreateTable;
+
 use DBIx::Tree::Persist;
 
-use File::Spec;
 use File::Temp;
 
 use File::Slurp; # For read_file.
 
 use FindBin::Real;
-
-# --------------------------------------------------
-
-sub create_table
-{
-	my($dbh, $table_name) = @_;
-	my($sql) = <<SQL;
-create table $table_name
-(
-id integer not null primary key,
-parent_id integer not null,
-class varchar(255) not null,
-value varchar(255)
-)
-SQL
-	$dbh -> do($sql);
-
-	return 0;
-
-}	# End of create_table.
 
 # -----------------------------------------------
 
@@ -99,33 +82,50 @@ sub read_a_file
 
 # ------------------------------------------------
 
-my($dir)  = File::Temp -> newdir;
-my($file) = File::Spec -> catfile($dir, 'test.sqlite');
-my(@opts) =
+my($table_name)                        = 'two';
+my($temp_file_handle, $temp_file_name) = File::Temp::tempfile('temp.XXXX', EXLOCK => 0, UNLINK => 1);
+my(@dsn)                               =
 (
-$ENV{DBI_DSN}  || "dbi:SQLite:dbname=$file",
+$ENV{DBI_DSN}  || "dbi:SQLite:$temp_file_name",
 $ENV{DBI_USER} || '',
 $ENV{DBI_PASS} || '',
 );
+my($dbh) = DBI -> connect(@dsn, {RaiseError => 1, PrintError => 1, AutoCommit => 1});
 
-my($dbh) = DBI -> connect(@opts, {RaiseError => 1, PrintError => 1, AutoCommit => 1});
+ok($dbh, 'Created $dbh');
 
-ok(defined $dbh, '$dbh is defined');
+my($creator) = DBIx::Admin::CreateTable -> new(dbh => $dbh, verbose => 0);
 
-my($table_name) = 'two';
-my($result)     = create_table($dbh, $table_name);
+ok($creator, 'Created $creator');
+
+$creator -> drop_table($table_name);
+
+ok(1, "Dropped table '$table_name' if it existed");
+
+my($primary_key) = $creator -> generate_primary_key_sql($table_name);
+
+ok($primary_key, "Generated primary key syntax for $ENV{DBI_DSN}");
+
+my($result) = $creator -> create_table(<<SQL);
+create table $table_name
+(
+id integer not null primary key,
+parent_id integer not null,
+class varchar(255) not null,
+value varchar(255)
+)
+SQL
 
 ok($DBI::errstr eq '', "created table $table_name");
-ok($result == 0, 'create_table() worked');
 
 $result = populate_table($dbh, $table_name);
 
 ok($DBI::errstr eq '', "populated table $table_name");
 ok($result == 0, 'populate_table() worked');
 
-my($persist) = DBIx::Tree::Persist -> new(table_name => $table_name, verbose => 1);
+my($persist) = DBIx::Tree::Persist -> new(dbh => $dbh, table_name => $table_name, verbose => 1);
 
-ok(defined $persist, 'DBIx::Tree::Persist.new() worked');
+ok($persist, 'DBIx::Tree::Persist.new() worked');
 
 $result = $persist -> run;
 ok($result == 0, 'DBIx::Tree::Persist.run() worked');

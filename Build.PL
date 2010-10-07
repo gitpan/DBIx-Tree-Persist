@@ -15,6 +15,7 @@ my($builder) = Module::Build -> new
 	{
 		common::sense            => 3.3,
 		Config::Tiny             => 2.12,
+		Data::Dumper::Concise    => 2.012,
 		DBD::SQLite              => 1.31,
 		DBI                      => 1.612,
 		DBIx::Admin::CreateTable => 2.07,

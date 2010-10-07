@@ -9,6 +9,7 @@ lib/DBIx/Tree/Persist/Create.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+README
 scripts/create.tables.pl
 scripts/drop.tables.pl
 scripts/populate.tables.pl

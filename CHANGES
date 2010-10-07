@@ -1,4 +1,16 @@
 Revision history for Perl extension DBIx::Tree::Persist.
 
+1.01  Thu Oct  7 10:09:00 2010
+	  - Add dbh as an optional parameter to new(). If not supplied, use the config file to get
+	  	DBI connect options. This makes testing easier, too. Document new parameter.
+	  - Add option data_structure to output a structure which can be turned into JSON.
+	  	This uses the new method build_structure().
+	  - Make pretty-printing the tree a stand-alone method: pretty_print().
+	  - Add Tree::DAG_Node::Persist to See Also.
+	  - Add README file.
+	  - Patch usage of File::Temp in t/test.t for BSD-based systems (EXLOCK => 0). This is part of
+	  	making the code look much more like t/test.t as shipped with Test::DAG_Node::Persist.
+	  - Adopt DBIx::Admin::CreateTable for t/test.t.
+
 1.00  Tue Sep 21  9:14:00 2010
 	  - Original version.
