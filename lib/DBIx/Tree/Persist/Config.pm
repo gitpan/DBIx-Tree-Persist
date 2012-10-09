@@ -1,6 +1,7 @@
 package DBIx::Tree::Persist::Config;
 
-use common::sense;
+use strict;
+use warnings;
 
 use Config::Tiny;
 
@@ -11,7 +12,7 @@ fieldhash my %config_file_path => 'config_file_path';
 fieldhash my %section          => 'section';
 fieldhash my %verbose          => 'verbose';
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 # -----------------------------------------------
 

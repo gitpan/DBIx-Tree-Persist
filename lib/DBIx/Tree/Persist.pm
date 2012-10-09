@@ -1,6 +1,7 @@
 package DBIx::Tree::Persist;
 
-use common::sense;
+use strict;
+use warnings;
 
 use Data::Dumper::Concise; # For Dumper().
 
@@ -10,17 +11,17 @@ use DBIx::Tree::Persist::Config;
 
 use Hash::FieldHash ':all';
 
-fieldhash my %copy_name       => 'copy_name';
-fieldhash my %data_structure  => 'data_structure';
-fieldhash my %dbh             => 'dbh';
-fieldhash my %starting_id     => 'starting_id';
-fieldhash my %table_name      => 'table_name';
-fieldhash my %verbose         => 'verbose';
+fieldhash my %copy_name      => 'copy_name';
+fieldhash my %data_structure => 'data_structure';
+fieldhash my %dbh            => 'dbh';
+fieldhash my %starting_id    => 'starting_id';
+fieldhash my %table_name     => 'table_name';
+fieldhash my %verbose        => 'verbose';
 
 use Tree;
 use Tree::Persist;
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 # -----------------------------------------------
 
@@ -144,7 +145,7 @@ sub new
 	$arg{table_name}     ||= '';
 	$arg{verbose}        ||= 0;
 	my($self)            = from_hash(bless({}, $class), \%arg);
- 
+
 	if (! $self -> dbh)
 	{
 		my($config) = DBIx::Tree::Persist::Config -> new -> config;
@@ -235,7 +236,7 @@ sub ugly_print
 
 =head1 NAME
 
-L<DBIx::Tree::Persist> - Play with Tree and Tree::Persist a la DBIx::Tree
+DBIx::Tree::Persist - Play with Tree and Tree::Persist a la DBIx::Tree
 
 =head1 Synopsis
 

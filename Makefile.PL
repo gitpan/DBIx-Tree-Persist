@@ -24,14 +24,13 @@ WriteMakefile
 	PL_FILES  => {},
 	PREREQ_PM =>
 	{
-		common::sense            => 3.3,
 		Config::Tiny             => 2.12,
 		Data::Dumper::Concise    => 2.012,
 		DBD::SQLite              => 1.31,
 		DBI                      => 1.612,
 		DBIx::Admin::CreateTable => 2.07,
 		File::Slurp              => 9999.13,
-		FindBin::Real            => 1.05,
+		FindBin                  => 1.49,
 		Hash::FieldHash          => 0.10,
 		Tree                     => 1.01,
 		Tree::Persist            => 1.01,

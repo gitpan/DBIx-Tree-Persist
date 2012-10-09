@@ -1,5 +1,13 @@
 Revision history for Perl extension DBIx::Tree::Persist.
 
+1.03  Web Feb 16 11:53:00 2011
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+	- Clean up tests to stop uninit warnings.
+
+1.02  Tue Nov 16 15:59:00 2010
+	- Switch from FindBin::Real to FindBin (which is in core).
+
 1.01  Thu Oct  7 10:09:00 2010
 	  - Add dbh as an optional parameter to new(). If not supplied, use the config file to get
 	  	DBI connect options. This makes testing easier, too. Document new parameter.

@@ -1,6 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-use common::sense;
+use strict;
+use warnings;
 
 use Test::More tests => 10;
 
@@ -14,7 +15,7 @@ use File::Temp;
 
 use File::Slurp; # For read_file.
 
-use FindBin::Real;
+use FindBin;
 
 # -----------------------------------------------
 
@@ -71,7 +72,7 @@ sub populate_table
 sub read_a_file
 {
 	my($input_file_name) = @_;
-	$input_file_name = FindBin::Real::Bin . "/../data/$input_file_name";
+	$input_file_name = "$FindBin::Bin/../data/$input_file_name";
 	my(@line)        = read_file($input_file_name);
 
 	chomp @line;
@@ -116,11 +117,11 @@ value varchar(255)
 )
 SQL
 
-ok($DBI::errstr eq '', "created table $table_name");
+ok(! defined $DBI::errstr, "created table $table_name");
 
 $result = populate_table($dbh, $table_name);
 
-ok($DBI::errstr eq '', "populated table $table_name");
+ok(! defined $DBI::errstr, "populated table $table_name");
 ok($result == 0, 'populate_table() worked');
 
 my($persist) = DBIx::Tree::Persist -> new(dbh => $dbh, table_name => $table_name, verbose => 1);
@@ -132,6 +133,6 @@ ok($result == 0, 'DBIx::Tree::Persist.run() worked');
 
 $dbh -> do("drop table $table_name");
 
-ok($DBI::errstr eq '', "dropped table $table_name");
+ok(! defined $DBI::errstr, "dropped table $table_name");
 
 $dbh -> disconnect;

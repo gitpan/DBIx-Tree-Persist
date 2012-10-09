@@ -6,8 +6,9 @@ build_requires:
   Test::More: 0.94
   Test::Pod: 1.44
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
 license: artistic
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,13 +17,13 @@ name: DBIx-Tree-Persist
 provides:
   DBIx::Tree::Persist:
     file: lib/DBIx/Tree/Persist.pm
-    version: 1.01
+    version: 1.03
   DBIx::Tree::Persist::Config:
     file: lib/DBIx/Tree/Persist/Config.pm
-    version: 1.01
+    version: 1.03
   DBIx::Tree::Persist::Create:
     file: lib/DBIx/Tree/Persist/Create.pm
-    version: 1.01
+    version: 1.03
 requires:
   Config::Tiny: 2.12
   DBD::SQLite: 1.31
@@ -30,11 +31,10 @@ requires:
   DBIx::Admin::CreateTable: 2.07
   Data::Dumper::Concise: 2.012
   File::Slurp: 9999.13
-  FindBin::Real: 1.05
+  FindBin: 1.49
   Hash::FieldHash: 0.1
   Tree: 1.01
   Tree::Persist: 1.01
-  common::sense: 3.3
 resources:
-  license: http://www.perlfoundation.org/artistic_license_1_0
-version: 1.01
+  license: http://opensource.org/licenses/artistic-license.php
+version: 1.03

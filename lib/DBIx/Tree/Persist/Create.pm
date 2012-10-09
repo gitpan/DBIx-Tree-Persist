@@ -1,6 +1,7 @@
 package DBIx::Tree::Persist::Create;
 
-use common::sense;
+use strict;
+use warnings;
 
 use DBI;
 
@@ -10,7 +11,7 @@ use DBIx::Tree::Persist::Config;
 
 use File::Slurp; # For read_file.
 
-use FindBin::Real;
+use FindBin;
 
 use Hash::FieldHash ':all';
 
@@ -18,7 +19,7 @@ fieldhash my %creator => 'creator';
 fieldhash my %dbh     => 'dbh';
 fieldhash my %verbose => 'verbose';
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 # -----------------------------------------------
 
@@ -238,7 +239,7 @@ sub populate_two_table
 sub read_a_file
 {
 	my($self, $input_file_name) = @_;
-	$input_file_name = FindBin::Real::Bin . "/../data/$input_file_name";
+	$input_file_name = "$FindBin::Bin/../data/$input_file_name";
 	my(@line)        = read_file($input_file_name);
 
 	chomp @line;
