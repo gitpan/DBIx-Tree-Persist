@@ -21,7 +21,7 @@ fieldhash my %verbose        => 'verbose';
 use Tree;
 use Tree::Persist;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 # -----------------------------------------------
 

@@ -19,7 +19,7 @@ fieldhash my %creator => 'creator';
 fieldhash my %dbh     => 'dbh';
 fieldhash my %verbose => 'verbose';
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 # -----------------------------------------------
 

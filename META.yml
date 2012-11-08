@@ -17,13 +17,13 @@ name: DBIx-Tree-Persist
 provides:
   DBIx::Tree::Persist:
     file: lib/DBIx/Tree/Persist.pm
-    version: 1.03
+    version: 1.04
   DBIx::Tree::Persist::Config:
     file: lib/DBIx/Tree/Persist/Config.pm
-    version: 1.03
+    version: 1.04
   DBIx::Tree::Persist::Create:
     file: lib/DBIx/Tree/Persist/Create.pm
-    version: 1.03
+    version: 1.04
 requires:
   Config::Tiny: 2.12
   DBD::SQLite: 1.31
@@ -31,10 +31,13 @@ requires:
   DBIx::Admin::CreateTable: 2.07
   Data::Dumper::Concise: 2.012
   File::Slurp: 9999.13
+  File::Temp: 0.22
   FindBin: 1.49
   Hash::FieldHash: 0.1
   Tree: 1.01
   Tree::Persist: 1.01
+  strict: 0
+  warnings: 0
 resources:
-  license: http://opensource.org/licenses/artistic-license.php
-version: 1.03
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.04
